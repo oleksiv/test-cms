@@ -14,8 +14,8 @@ class PostLoginTest extends TestCase
         ));
 
         $data = array(
-            '_username' => 'admin',
-            '_password' => 'admin',
+            '_username' => 'hi.oleksiv@gmail.com',
+            '_password' => 'secret',
         );
         $response = $client->post('/api/login_check', [
             'body' => json_encode($data),
