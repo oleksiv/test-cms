@@ -18,4 +18,5 @@ return [
     FOS\RestBundle\FOSRestBundle::class => ['all' => true],
     FOS\UserBundle\FOSUserBundle::class => ['all' => true],
     Doctrine\Bundle\FixturesBundle\DoctrineFixturesBundle::class => ['dev' => true, 'test' => true],
+    JMS\SerializerBundle\JMSSerializerBundle::class => ['all' => true],
 ];

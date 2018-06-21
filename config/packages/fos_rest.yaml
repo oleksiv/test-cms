@@ -1,13 +1,20 @@
-# Read the documentation: https://symfony.com/doc/master/bundles/FOSRestBundle/index.html
 fos_rest:
-    body_listener: true
-    view:
-        view_response_listener: true
-    serializer:
-        serialize_null: true
+    routing_loader:
+        default_format: json
     body_converter:
         enabled: true
+        validate: true
+    serializer:
+        serialize_null: true
+    view:
+        formats:
+            xml:  false
+            json: true
+            rss:  false
+            yml:  true
+        view_response_listener: force
+    param_fetcher_listener: force
     format_listener:
         rules:
-            - { path: ^/api, prefer_extension: true, fallback_format: json, priorities: [ json, html ] }
-            - { path: ^/, prefer_extension: true, fallback_format: html, priorities: [ html ] }
+            - { path: '^/api/', priorities: ['json', 'yml'], fallback_format: json, prefer_extension: true }
+            - { path: '^/', stop: true } # FOSRest should not handle other routes than API

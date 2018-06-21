@@ -8,6 +8,7 @@
         "friendsofsymfony/user-bundle": "^2.1",
         "guzzlehttp/guzzle": "^6.3",
         "jms/serializer-bundle": "^2.4",
+        "league/fractal": "^0.17.0",
         "lexik/jwt-authentication-bundle": "^2.4",
         "phpunit/phpunit": "^7.2",
         "sensio/framework-extra-bundle": "^5.1",
@@ -22,6 +23,7 @@
         "symfony/monolog-bundle": "^3.1",
         "symfony/orm-pack": "*",
         "symfony/process": "^4.1",
+        "symfony/requirements-checker": "^1.1",
         "symfony/security-bundle": "^4.1",
         "symfony/serializer-pack": "*",
         "symfony/swiftmailer-bundle": "^3.1",
@@ -65,7 +67,8 @@
     "scripts": {
         "auto-scripts": {
             "cache:clear": "symfony-cmd",
-            "assets:install %PUBLIC_DIR%": "symfony-cmd"
+            "assets:install %PUBLIC_DIR%": "symfony-cmd",
+            "requirements-checker": "script"
         },
         "post-install-cmd": [
             "@auto-scripts"
