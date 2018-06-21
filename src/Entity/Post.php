@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bundle\MakerBundle\Str;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -20,7 +21,7 @@ class Post
     private $id;
 
     /**
-     * 
+     * @Assert\NotNull()
      * @ORM\Column(type="string", length=255)
      */
     private $post_title;
@@ -36,7 +37,6 @@ class Post
     private $post_excerpt;
 
     /**
-     * 
      * @ORM\Column(type="string", length=255)
      */
     private $post_alias;
@@ -53,7 +53,7 @@ class Post
     private $post_type;
 
     /**
-     * 
+     * @Assert\NotNull()
      * @ORM\Column(type="string", length=255)
      */
     private $post_status;
@@ -68,7 +68,7 @@ class Post
         return $this->post_title;
     }
 
-    public function setPostTitle(string $post_title): self
+    public function setPostTitle(?string $post_title): self
     {
         $this->post_title = $post_title;
 
@@ -104,7 +104,7 @@ class Post
         return $this->post_alias;
     }
 
-    public function setPostAlias(string $post_alias): self
+    public function setPostAlias(?string $post_alias): self
     {
         $this->post_alias = $post_alias;
 
@@ -144,6 +144,24 @@ class Post
     {
         $this->post_status = $post_status;
 
+        return $this;
+    }
+
+    /**
+     * Converts string to alias format
+     * @return $this
+     */
+    public function setAliasBasedOnTitle()
+    {
+        $value = $this->getPostAlias() ?? $this->getPostTitle();
+        // Replace unwanted subsets of characters
+        $value = preg_replace('/([^0-9a-zA-Z])+/u', '-', $value);
+        // Remove hyphens from right
+        $value = preg_replace('/(-)+$/u', '', $value);
+        // Remove hyphens from left
+        $value = preg_replace('/^(-)+/u', '', $value);
+        // Set alias
+        $this->setPostAlias($value);
         return $this;
     }
 }

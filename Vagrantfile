@@ -9,8 +9,20 @@ Vagrant.configure("2") do |config|
   config.vbguest.auto_update = false
 
   # Mount shared folder using NFS
-  config.vm.synced_folder ".", "/var/www/html"
-  config.vm.synced_folder "./vendor", "/var/www/html/vendor", disabled: true
+  config.vm.synced_folder ".", "/var/www/html", disabled: true
+
+  config.vm.synced_folder ".tmp", "/var/www/html/.tmp", disabled: false
+  config.vm.synced_folder "./bin", "/var/www/html/bin", disabled: false
+  config.vm.synced_folder "./config", "/var/www/html/config", disabled: false
+  config.vm.synced_folder "./public", "/var/www/html/public", disabled: false
+  config.vm.synced_folder "./src", "/var/www/html/src", disabled: false
+  config.vm.synced_folder "./templates", "/var/www/html/templates", disabled: false
+  config.vm.synced_folder "./tests", "/var/www/html/tests", disabled: false
+  config.vm.synced_folder "./translations", "/var/www/html/translations", disabled: false
+
+  config.vm.provision "file", source: ".env", destination: "/var/www/html/.env"
+  config.vm.provision "file", source: "composer.json", destination: "/var/www/html/composer.json"
+  config.vm.provision "file", source: "phpunit.xml.dist", destination: "/var/www/html/phpunit.xml.dist"
 
   # Apache
   config.vm.network "forwarded_port", guest: 80, host: 8080
