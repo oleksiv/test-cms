@@ -42,7 +42,8 @@ class Post
     private $post_alias;
 
     /**
-     * @ORM\Column(type="string", length=255, nullable=true)
+     * @ORM\Column(type="integer", nullable=true)
+     * @ORM\ManyToOne(targetEntity="App\Entity\Image", inversedBy="posts")
      */
     private $post_image;
 
@@ -111,12 +112,12 @@ class Post
         return $this;
     }
 
-    public function getPostImage(): ?string
+    public function getPostImage()
     {
         return $this->post_image;
     }
 
-    public function setPostImage(?string $post_image): self
+    public function setPostImage($post_image)
     {
         $this->post_image = $post_image;
 

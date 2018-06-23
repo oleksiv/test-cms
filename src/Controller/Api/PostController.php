@@ -7,7 +7,6 @@ use App\Form\PostType;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item;
 use App\Transformers\PostTransformer;
-use Symfony\Component\CssSelector\Parser\Handler\StringHandler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -89,7 +88,6 @@ class PostController extends Controller
         $form->submit($request->request->all());
         // Validate form
         if($form->isValid()) {
-
             // Convert alias if needed
             $post->setAliasBasedOnTitle();
             // Save to database if valid

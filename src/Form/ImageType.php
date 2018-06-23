@@ -2,30 +2,25 @@
 
 namespace App\Form;
 
-use App\Entity\Post;
+use App\Entity\Image;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class PostType extends AbstractType
+class ImageType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('post_title')
-            ->add('post_content')
-            ->add('post_excerpt')
-            ->add('post_alias')
-            ->add('post_image', ImageType::class)
-            ->add('post_status')
-        ;
+            ->add('image_path', FileType::class, array());
     }
 
 
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'data_class' => Post::class,
+            'data_class' => Image::class,
             'csrf_protection' => false,
         ]);
     }
