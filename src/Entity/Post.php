@@ -2,14 +2,22 @@
 
 namespace App\Entity;
 
+use App\Contracts\AliasInterface;
+use App\Helpers\StringHelper;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Bundle\MakerBundle\Str;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\PostRepository")
+ * @ORM\HasLifecycleCallbacks()
+ * @UniqueEntity(
+ *     fields={"post_alias"},
+ *     errorPath="post_alias",
+ *     message="This alias is already in use."
+ * )
  */
-class Post
+class Post implements AliasInterface
 {
     const TYPE_POST = 'post';
     const TYPE_ARTICLE = 'article';
@@ -37,13 +45,12 @@ class Post
     private $post_excerpt;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, unique=true)
      */
     private $post_alias;
 
     /**
-     * @ORM\Column(type="integer", nullable=true)
-     * @ORM\ManyToOne(targetEntity="App\Entity\Image", inversedBy="posts")
+     * @ORM\ManyToOne(targetEntity="App\Entity\Image")
      */
     private $post_image;
 
@@ -59,21 +66,55 @@ class Post
      */
     private $post_status;
 
+    /**
+     * @ORM\Column(type="datetime")
+     */
+    private $created_at;
+    /**
+     * @ORM\Column(type="datetime")
+     */
+    private $updated_at;
+
+    /**
+     * @return mixed
+     */
+    public function getCreatedAt()
+    {
+        return $this->created_at;
+    }
+
+    /**
+     * @ORM\PrePersist
+     * @return Post
+     */
+    public function setCreatedAt()
+    {
+        $this->created_at = new \DateTime();
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getUpdatedAt()
+    {
+        return $this->updated_at;
+    }
+
+    /**
+     * @ORM\PrePersist
+     * @ORM\PreUpdate
+     * @return Post
+     */
+    public function setUpdatedAt()
+    {
+        $this->updated_at = new \DateTime();
+        return $this;
+    }
+
     public function getId()
     {
         return $this->id;
-    }
-
-    public function getPostTitle(): ?string
-    {
-        return $this->post_title;
-    }
-
-    public function setPostTitle(?string $post_title): self
-    {
-        $this->post_title = $post_title;
-
-        return $this;
     }
 
     public function getPostContent(): ?string
@@ -100,18 +141,9 @@ class Post
         return $this;
     }
 
-    public function getPostAlias(): ?string
-    {
-        return $this->post_alias;
-    }
-
-    public function setPostAlias(?string $post_alias): self
-    {
-        $this->post_alias = $post_alias;
-
-        return $this;
-    }
-
+    /**
+     * @return null|Image
+     */
     public function getPostImage()
     {
         return $this->post_image;
@@ -124,12 +156,12 @@ class Post
         return $this;
     }
 
-    public function getPostType(): ?string
+    public function getPostType()
     {
         return $this->post_type;
     }
 
-    public function setPostType(string $post_type = self::TYPE_POST): self
+    public function setPostType($post_type = self::TYPE_POST)
     {
         $this->post_type = $post_type;
 
@@ -155,14 +187,31 @@ class Post
     public function setAliasBasedOnTitle()
     {
         $value = $this->getPostAlias() ?? $this->getPostTitle();
-        // Replace unwanted subsets of characters
-        $value = preg_replace('/([^0-9a-zA-Z])+/u', '-', $value);
-        // Remove hyphens from right
-        $value = preg_replace('/(-)+$/u', '', $value);
-        // Remove hyphens from left
-        $value = preg_replace('/^(-)+/u', '', $value);
-        // Set alias
-        $this->setPostAlias($value);
+        $this->setPostAlias(StringHelper::hyphenCase($value));
+        return $this;
+    }
+
+    public function getPostAlias(): ?string
+    {
+        return $this->post_alias;
+    }
+
+    public function setPostAlias(?string $post_alias): self
+    {
+        $this->post_alias = $post_alias;
+
+        return $this;
+    }
+
+    public function getPostTitle(): ?string
+    {
+        return $this->post_title;
+    }
+
+    public function setPostTitle(?string $post_title): self
+    {
+        $this->post_title = $post_title;
+
         return $this;
     }
 }

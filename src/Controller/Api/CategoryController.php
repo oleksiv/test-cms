@@ -2,77 +2,73 @@
 
 namespace App\Controller\Api;
 
-use App\Entity\Post;
-use App\Form\PostType;
-use App\Repository\PostRepository;
-use App\Serializers\DataSerializer;
-use Doctrine\ORM\Tools\Pagination\Paginator;
+use App\Entity\Category;
+use App\Form\CategoryType;
+use App\Transformers\CategoryTransformer;
 use League\Fractal\Manager;
-use League\Fractal\Resource\Collection;
 use League\Fractal\Resource\Item;
-use App\Transformers\PostTransformer;
-use Symfony\Component\HttpFoundation\JsonResponse;
+use App\Serializers\DataSerializer;
+use App\Repository\CategoryRepository;
+use League\Fractal\Resource\Collection;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
- * Class PostController
+ * Class CategoryController
  * @package App\Controller\Api
- * @Route("/api/posts")
+ * @Route("/api/categories")
  */
-class PostController extends Controller
+class CategoryController extends Controller
 {
     /**
-     * @Route("", name="posts_index", methods="GET")
+     * @Route("", name="categories_index", methods="GET")
      *
-     * @param PostRepository $postRepository
+     * @param CategoryRepository $categoryRepository
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    public function index(PostRepository $postRepository, Request $request)
+    public function index(CategoryRepository $categoryRepository, Request $request)
     {
         $page = $request->get('page', 1) - 1;
         $limit = $request->get('limit', 10);
-        $query = $postRepository->createQueryBuilder('post')
+        $query = $categoryRepository->createQueryBuilder('post')
             ->setMaxResults($limit)
             ->setFirstResult($page * $limit);
-        $posts = new Paginator($query);
-        $count = count($posts);
+        $categories = new Paginator($query);
+        $count = count($categories);
         $manager = new Manager();
-        $manager->parseIncludes('post_image');
         $manager->setSerializer(new DataSerializer());
-        $resource = new Collection($posts, new PostTransformer($this->container));
-        return $this->json(array('total_posts' => $count, 'data' => $manager->createData($resource)->toArray()), 200);
+        $resource = new Collection($categories, new CategoryTransformer());
+        return $this->json(array('total_categories' => $count, 'data' => $manager->createData($resource)->toArray()), 200);
     }
 
     /**
-     * @Route("", name="posts_create", methods="POST")
+     * @Route("", name="categories_create", methods="POST")
      *
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     public function create(Request $request)
     {
-        $post = new Post();
-        // Set post type to default TYPE_POST
-        $post->setPostType(Post::TYPE_POST);
-        $form = $this->createForm(PostType::class, $post);
+        $category = new Category();
+        $form = $this->createForm(CategoryType::class, $category);
         // Fill the form with submitted data
         $form->submit($request->request->all());
         // Validate form
         if ($form->isValid()) {
             // Convert alias if needed
-            $post->setAliasBasedOnTitle();
+            $category->setAliasBasedOnTitle();
             // Save to database if valid
             $em = $this->getDoctrine()->getManager();
-            $em->persist($post);
+            $em->persist($category);
             $em->flush();
             // Transform post data
             $manager = new Manager();
             $manager->setSerializer(new DataSerializer());
             // Prepare data for response
-            $resource = new Item($post, new PostTransformer($this->container));
+            $resource = new Item($category, new CategoryTransformer());
             // Status code 201 Created
             return $this->json($manager->createData($resource)->toArray(), 201);
         }
@@ -84,48 +80,46 @@ class PostController extends Controller
 
 
     /**
-     * @Route("/{id}", name="posts_show", methods="GET")
+     * @Route("/{id}", name="categories_show", methods="GET")
      *
-     * @param Post $post
+     * @param Category $category
      * @return Response
      */
-    public function show(Post $post): Response
+    public function show(Category $category): Response
     {
         // Serializer manager
         $manager = new Manager();
         $manager->setSerializer(new DataSerializer());
         // Prepare data for response
-        $resource = new Item($post, new PostTransformer($this->container));
+        $resource = new Item($category, new CategoryTransformer());
         return $this->json($manager->createData($resource)->toArray());
     }
 
     /**
-     * @Route("/{id}", name="posts_update", methods="PUT")
+     * @Route("/{id}", name="categories_update", methods="PUT")
      *
-     * @param Post $post
+     * @param Category $category
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    public function update(Post $post, Request $request)
+    public function update(Category $category, Request $request)
     {
-        // Set post type to default TYPE_POST
-        $post->setPostType(Post::TYPE_POST);
-        $form = $this->createForm(PostType::class, $post);
+        $form = $this->createForm(CategoryType::class, $category);
         // Fill the form with submitted data
         $form->submit($request->request->all());
         // Validate form
         if ($form->isValid()) {
             // Convert alias if needed
-            $post->setAliasBasedOnTitle();
+            $category->setAliasBasedOnTitle();
             // Save to database if valid
             $em = $this->getDoctrine()->getManager();
-            $em->persist($post);
+            $em->persist($category);
             $em->flush();
             // Transform post data
             $manager = new Manager();
             $manager->setSerializer(new DataSerializer());
             // Prepare data for response
-            $resource = new Item($post, new PostTransformer($this->container));
+            $resource = new Item($category, new CategoryTransformer());
             // Status code 201 Created
             return $this->json($manager->createData($resource)->toArray(), 201);
         }

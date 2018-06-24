@@ -4,12 +4,14 @@ namespace App\Controller\Api;
 
 use App\Entity\Image;
 use App\Form\ImageType;
+use App\Serializers\DataSerializer;
 use App\Transformers\ImageTransformer;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item;
 use League\Fractal\Serializer\DataArraySerializer;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Controller\Api\Controller as BaseController;
 
@@ -49,7 +51,7 @@ class ImagesController extends BaseController
             $em->flush();
             // Transform post data
             $manager = new Manager();
-            $manager->setSerializer(new DataArraySerializer());
+            $manager->setSerializer(new DataSerializer());
             // Prepare data for response
             $resource = new Item($image, new ImageTransformer($this->container));
             // Status code 201 Created
@@ -59,5 +61,21 @@ class ImagesController extends BaseController
         return $this->json(array(
             'messages' => $this->getFormErrors($form)
         ), 400);
+    }
+
+    /**
+     * @Route("/{id}", name="image_show", methods="GET")
+     *
+     * @param Image $image
+     * @return Response
+     */
+    public function show(Image $image): Response
+    {
+        // Serializer manager
+        $manager = new Manager();
+        $manager->setSerializer(new DataSerializer());
+        // Prepare data for response
+        $resource = new Item($image, new ImageTransformer($this->container));
+        return $this->json($manager->createData($resource)->toArray());
     }
 }
