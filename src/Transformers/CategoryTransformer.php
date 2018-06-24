@@ -9,7 +9,7 @@ class CategoryTransformer extends TransformerAbstract
 {
 
     protected $availableIncludes = [
-
+        'children'
     ];
 
     /**
@@ -20,14 +20,18 @@ class CategoryTransformer extends TransformerAbstract
     {
         return array(
             'id' => $category->getId(),
-            'post_title' => $category->getCategoryTitle(),
-            'post_content' => $category->getCategoryContent(),
-            'post_alias' => $category->getCategoryAlias(),
-            'post_image' => $category->getCategoryImage() ? $category->getCategoryImage()->getId() : null,
+            'title' => $category->getTitle(),
+            'content' => $category->getContent(),
+            'alias' => $category->getAlias(),
+            'image' => $category->getImage() ? $category->getImage()->getId() : null,
             'created_at' => $category->getCreatedAt(),
             'updated_at' => $category->getUpdatedAt(),
         );
 
+    }
+
+    public function includeChildren(Category $category) {
+        return $this->collection($category->getChildren(), new CategoryTransformer());
     }
 
 }

@@ -40,7 +40,7 @@ class PostController extends Controller
         $posts = new Paginator($query);
         $count = count($posts);
         $manager = new Manager();
-        $manager->parseIncludes('post_image');
+        $manager->parseIncludes('image');
         $manager->setSerializer(new DataSerializer());
         $resource = new Collection($posts, new PostTransformer($this->container));
         return $this->json(array('total_posts' => $count, 'data' => $manager->createData($resource)->toArray()), 200);

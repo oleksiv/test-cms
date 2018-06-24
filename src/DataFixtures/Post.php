@@ -12,11 +12,11 @@ class Post extends Fixture
 
         for ($i = 0; $i < 100; $i++) {
             $post = new \App\Entity\Post();
-            $post->setPostTitle('Post title #' . $i);
+            $post->setTitle('Post title #' . $i);
             $post->setAliasBasedOnTitle();
-            $post->setPostType(\App\Entity\Post::TYPE_POST);
-            $post->setPostContent('Post content #' . $i);
-            $post->setPostStatus('draft');
+            $post->setType(\App\Entity\Post::TYPE_POST);
+            $post->setContent('Post content #' . $i);
+            $post->setStatus('draft');
             $manager->persist($post);
         }
 

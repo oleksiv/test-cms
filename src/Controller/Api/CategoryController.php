@@ -33,12 +33,15 @@ class CategoryController extends Controller
     {
         $page = $request->get('page', 1) - 1;
         $limit = $request->get('limit', 10);
-        $query = $categoryRepository->createQueryBuilder('post')
+        $query = $categoryRepository->createQueryBuilder('category')
+            // Select only top category items
+            ->where("category.parent IS NULL")
             ->setMaxResults($limit)
             ->setFirstResult($page * $limit);
         $categories = new Paginator($query);
         $count = count($categories);
         $manager = new Manager();
+        $manager->parseIncludes('children');
         $manager->setSerializer(new DataSerializer());
         $resource = new Collection($categories, new CategoryTransformer());
         return $this->json(array('total_categories' => $count, 'data' => $manager->createData($resource)->toArray()), 200);

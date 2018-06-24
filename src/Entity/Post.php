@@ -12,8 +12,8 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @ORM\Entity(repositoryClass="App\Repository\PostRepository")
  * @ORM\HasLifecycleCallbacks()
  * @UniqueEntity(
- *     fields={"post_alias"},
- *     errorPath="post_alias",
+ *     fields={"alias"},
+ *     errorPath="alias",
  *     message="This alias is already in use."
  * )
  */
@@ -32,39 +32,39 @@ class Post implements AliasInterface
      * @Assert\NotNull()
      * @ORM\Column(type="string", length=255)
      */
-    private $post_title;
+    private $title;
 
     /**
      * @ORM\Column(type="text", nullable=true)
      */
-    private $post_content;
+    private $content;
 
     /**
      * @ORM\Column(type="text", nullable=true)
      */
-    private $post_excerpt;
+    private $excerpt;
 
     /**
      * @ORM\Column(type="string", length=255, unique=true)
      */
-    private $post_alias;
+    private $alias;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Image")
      */
-    private $post_image;
+    private $image;
 
     /**
      * @Assert\NotNull()
      * @ORM\Column(type="string", length=255)
      */
-    private $post_type;
+    private $type;
 
     /**
      * @Assert\NotNull()
      * @ORM\Column(type="string", length=255)
      */
-    private $post_status;
+    private $status;
 
     /**
      * @ORM\Column(type="datetime")
@@ -117,26 +117,26 @@ class Post implements AliasInterface
         return $this->id;
     }
 
-    public function getPostContent(): ?string
+    public function getContent(): ?string
     {
-        return $this->post_content;
+        return $this->content;
     }
 
-    public function setPostContent(?string $post_content): self
+    public function setContent(?string $content): self
     {
-        $this->post_content = $post_content;
+        $this->content = $content;
 
         return $this;
     }
 
-    public function getPostExcerpt(): ?string
+    public function getExcerpt(): ?string
     {
-        return $this->post_excerpt;
+        return $this->excerpt;
     }
 
-    public function setPostExcerpt(?string $post_excerpt): self
+    public function setExcerpt(?string $excerpt): self
     {
-        $this->post_excerpt = $post_excerpt;
+        $this->excerpt = $excerpt;
 
         return $this;
     }
@@ -144,38 +144,38 @@ class Post implements AliasInterface
     /**
      * @return null|Image
      */
-    public function getPostImage()
+    public function getImage()
     {
-        return $this->post_image;
+        return $this->image;
     }
 
-    public function setPostImage($post_image)
+    public function setImage($image)
     {
-        $this->post_image = $post_image;
+        $this->image = $image;
 
         return $this;
     }
 
-    public function getPostType()
+    public function getType()
     {
-        return $this->post_type;
+        return $this->type;
     }
 
-    public function setPostType($post_type = self::TYPE_POST)
+    public function setType($type = self::TYPE_POST)
     {
-        $this->post_type = $post_type;
+        $this->type = $type;
 
         return $this;
     }
 
-    public function getPostStatus(): ?string
+    public function getStatus(): ?string
     {
-        return $this->post_status;
+        return $this->status;
     }
 
-    public function setPostStatus(string $post_status): self
+    public function setStatus(string $status): self
     {
-        $this->post_status = $post_status;
+        $this->status = $status;
 
         return $this;
     }
@@ -186,31 +186,31 @@ class Post implements AliasInterface
      */
     public function setAliasBasedOnTitle()
     {
-        $value = $this->getPostAlias() ?? $this->getPostTitle();
-        $this->setPostAlias(StringHelper::hyphenCase($value));
+        $value = $this->getAlias() ?? $this->getTitle();
+        $this->setAlias(StringHelper::hyphenCase($value));
         return $this;
     }
 
-    public function getPostAlias(): ?string
+    public function getAlias(): ?string
     {
-        return $this->post_alias;
+        return $this->alias;
     }
 
-    public function setPostAlias(?string $post_alias): self
+    public function setAlias(?string $alias): self
     {
-        $this->post_alias = $post_alias;
+        $this->alias = $alias;
 
         return $this;
     }
 
-    public function getPostTitle(): ?string
+    public function getTitle(): ?string
     {
-        return $this->post_title;
+        return $this->title;
     }
 
-    public function setPostTitle(?string $post_title): self
+    public function setTitle(?string $title): self
     {
-        $this->post_title = $post_title;
+        $this->title = $title;
 
         return $this;
     }

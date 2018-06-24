@@ -11,12 +11,27 @@ class Category extends Fixture
     {
         for ($i = 0; $i < 100; $i++) {
             $post = new \App\Entity\Category();
-            $post->setCategoryTitle('Category title #' . $i);
+            $post->setTitle('Category title #' . $i);
             $post->setAliasBasedOnTitle();
-            $post->setCategoryContent('Post content #' . $i);
+            $post->setContent('Post content #' . $i);
             $manager->persist($post);
         }
 
+        $manager->flush();
+
+        // Fetch all categories
+        $categories = $manager->getRepository(\App\Entity\Category::class)->findAll();
+        foreach ($categories as $category) {
+            // Create child categories
+            $post = new \App\Entity\Category();
+            $post->setTitle('Category child for #' . $category->getId());
+            $post->setAliasBasedOnTitle();
+            $post->setContent('Category child for #' . $category->getId());
+            $post->setParent($category);
+            $manager->persist($post);
+        }
+
+        // Save categories
         $manager->flush();
     }
 }

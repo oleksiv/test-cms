@@ -24,7 +24,7 @@ class Image
     private $image_path;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Post", mappedBy="post_image")
+     * @ORM\OneToMany(targetEntity="App\Entity\Post", mappedBy="image")
      */
     private $posts;
 

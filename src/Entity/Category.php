@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Contracts\AliasInterface;
 use App\Helpers\StringHelper;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
@@ -11,8 +12,8 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  * @ORM\Entity(repositoryClass="App\Repository\CategoryRepository")
  * @ORM\HasLifecycleCallbacks()
  * @UniqueEntity(
- *     fields={"category_alias"},
- *     errorPath="category_alias",
+ *     fields={"alias"},
+ *     errorPath="alias",
  *     message="This alias is already in use."
  * )
  */
@@ -28,22 +29,22 @@ class Category implements AliasInterface
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private $category_title;
+    private $title;
 
     /**
      * @ORM\Column(type="text", nullable=true)
      */
-    private $category_content;
+    private $content;
 
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private $category_alias;
+    private $alias;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Image")
      */
-    private $category_image;
+    private $image;
 
     /**
      * @ORM\Column(type="datetime")
@@ -54,6 +55,56 @@ class Category implements AliasInterface
      * @ORM\Column(type="datetime")
      */
     private $updated_at;
+
+    /**
+     * @ORM\OneToMany(targetEntity="Category", mappedBy="parent")
+     */
+    private $children;
+    /**
+     * @ORM\ManyToOne(targetEntity="Category", inversedBy="children", fetch="EAGER")
+     */
+    private $parent;
+
+    public function __construct()
+    {
+        $this->children = new ArrayCollection();
+    }
+    /**
+     * @return mixed
+     */
+    public function getChildren()
+    {
+        return $this->children;
+    }
+
+    /**
+     * @param mixed $children
+     * @return Category
+     */
+    public function setChildren($children)
+    {
+        $this->children = $children;
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getParent()
+    {
+        return $this->parent;
+    }
+
+
+    /**
+     * @param mixed $parent
+     * @return Category
+     */
+    public function setParent($parent)
+    {
+        $this->parent = $parent;
+        return $this;
+    }
 
     /**
      * @return mixed
@@ -97,38 +148,14 @@ class Category implements AliasInterface
         return $this->id;
     }
 
-    public function getCategoryTitle(): ?string
+    public function getContent(): ?string
     {
-        return $this->category_title;
+        return $this->content;
     }
 
-    public function setCategoryTitle($category_title)
+    public function setContent(?string $content): self
     {
-        $this->category_title = $category_title;
-
-        return $this;
-    }
-
-    public function getCategoryContent(): ?string
-    {
-        return $this->category_content;
-    }
-
-    public function setCategoryContent(?string $category_content): self
-    {
-        $this->category_content = $category_content;
-
-        return $this;
-    }
-
-    public function getCategoryAlias(): ?string
-    {
-        return $this->category_alias;
-    }
-
-    public function setCategoryAlias(string $category_alias): self
-    {
-        $this->category_alias = $category_alias;
+        $this->content = $content;
 
         return $this;
     }
@@ -136,22 +163,46 @@ class Category implements AliasInterface
     /**
      * @return Image
      */
-    public function getCategoryImage()
+    public function getImage()
     {
-        return $this->category_image;
+        return $this->image;
     }
 
-    public function setCategoryImage(?string $category_image): self
+    public function setImage(?string $image): self
     {
-        $this->category_image = $category_image;
+        $this->image = $image;
 
         return $this;
     }
 
     public function setAliasBasedOnTitle()
     {
-        $value = $this->getCategoryAlias() ?? $this->getCategoryTitle();
-        $this->setCategoryAlias(StringHelper::hyphenCase($value));
+        $value = $this->getAlias() ?? $this->getTitle();
+        $this->setAlias(StringHelper::hyphenCase($value));
+        return $this;
+    }
+
+    public function getAlias(): ?string
+    {
+        return $this->alias;
+    }
+
+    public function setAlias(string $alias): self
+    {
+        $this->alias = $alias;
+
+        return $this;
+    }
+
+    public function getTitle(): ?string
+    {
+        return $this->title;
+    }
+
+    public function setTitle($title)
+    {
+        $this->title = $title;
+
         return $this;
     }
 }
