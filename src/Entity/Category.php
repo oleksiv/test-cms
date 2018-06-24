@@ -102,7 +102,7 @@ class Category implements AliasInterface
         return $this->category_title;
     }
 
-    public function setCategoryTitle(string $category_title): self
+    public function setCategoryTitle($category_title)
     {
         $this->category_title = $category_title;
 
