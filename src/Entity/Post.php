@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Contracts\AliasInterface;
 use App\Helpers\StringHelper;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -76,6 +77,86 @@ class Post implements AliasInterface
     private $updated_at;
 
     /**
+     * @ORM\ManyToMany(targetEntity="Category", mappedBy="posts", cascade={"persist"})
+     */
+    private $categories;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="Tag", mappedBy="posts", cascade={"persist"})
+     */
+    private $tags;
+
+    /**
+     * @return mixed
+     */
+    public function getTags()
+    {
+        return $this->tags;
+    }
+
+    /**
+     * @param mixed $tags
+     * @return Post
+     */
+    public function setTags($tags)
+    {
+        $this->tags = $tags;
+        return $this;
+    }
+
+    /**
+     * @ORM\ManyToOne(targetEntity="Category", inversedBy="posts", cascade={"persist"})
+     */
+    private $default_category;
+
+    /**
+     * Post constructor.
+     */
+    public function __construct()
+    {
+        $this->categories = new ArrayCollection();
+        $this->tags = new ArrayCollection();
+    }
+
+    /**
+     * @return Category
+     */
+    public function getDefaultCategory()
+    {
+        return $this->default_category;
+    }
+
+    /**
+     * @param mixed $default_category
+     * @return Post
+     */
+    public function setDefaultCategory($default_category)
+    {
+        $this->default_category = $default_category;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getCategories()
+    {
+        return $this->categories;
+    }
+
+    /**
+     * @param mixed $categories
+     * @return Post
+     */
+    public function setCategories($categories)
+    {
+        $this->categories = $categories;
+
+        return $this;
+    }
+
+    /**
      * @return mixed
      */
     public function getCreatedAt()
@@ -112,16 +193,26 @@ class Post implements AliasInterface
         return $this;
     }
 
+    /**
+     * @return mixed
+     */
     public function getId()
     {
         return $this->id;
     }
 
+    /**
+     * @return null|string
+     */
     public function getContent(): ?string
     {
         return $this->content;
     }
 
+    /**
+     * @param null|string $content
+     * @return Post
+     */
     public function setContent(?string $content): self
     {
         $this->content = $content;
@@ -129,11 +220,18 @@ class Post implements AliasInterface
         return $this;
     }
 
+    /**
+     * @return null|string
+     */
     public function getExcerpt(): ?string
     {
         return $this->excerpt;
     }
 
+    /**
+     * @param null|string $excerpt
+     * @return Post
+     */
     public function setExcerpt(?string $excerpt): self
     {
         $this->excerpt = $excerpt;
@@ -149,6 +247,10 @@ class Post implements AliasInterface
         return $this->image;
     }
 
+    /**
+     * @param $image
+     * @return $this
+     */
     public function setImage($image)
     {
         $this->image = $image;
@@ -156,11 +258,18 @@ class Post implements AliasInterface
         return $this;
     }
 
+    /**
+     * @return mixed
+     */
     public function getType()
     {
         return $this->type;
     }
 
+    /**
+     * @param string $type
+     * @return $this
+     */
     public function setType($type = self::TYPE_POST)
     {
         $this->type = $type;
@@ -168,12 +277,19 @@ class Post implements AliasInterface
         return $this;
     }
 
+    /**
+     * @return null|string
+     */
     public function getStatus(): ?string
     {
         return $this->status;
     }
 
-    public function setStatus(string $status): self
+    /**
+     * @param $status
+     * @return $this
+     */
+    public function setStatus($status)
     {
         $this->status = $status;
 
@@ -191,27 +307,85 @@ class Post implements AliasInterface
         return $this;
     }
 
+    /**
+     * @return null|string
+     */
     public function getAlias(): ?string
     {
         return $this->alias;
     }
 
-    public function setAlias(?string $alias): self
+    /**
+     * @param $alias
+     * @return $this
+     */
+    public function setAlias($alias)
     {
         $this->alias = $alias;
 
         return $this;
     }
 
-    public function getTitle(): ?string
+    /**
+     * @return null|string
+     */
+    public function getTitle()
     {
         return $this->title;
     }
 
+    /**
+     * @param null|string $title
+     * @return Post
+     */
     public function setTitle(?string $title): self
     {
         $this->title = $title;
 
         return $this;
+    }
+
+    /**
+     * @param Category $category
+     * @return void
+     */
+    public function addCategory(Category $category)
+    {
+        if ($this->categories->contains($category)) {
+            return;
+        }
+        $this->categories->add($category);
+        $category->addPost($this);
+    }
+
+    /**
+     * @param Category $category
+     */
+    public function removeCategory(Category $category)
+    {
+        $this->categories->removeElement($category);
+        $category->removePost($this);
+    }
+
+    /**
+     * @param Tag $tag
+     * @return void
+     */
+    public function addTag(Tag $tag)
+    {
+        if ($this->tags->contains($tag)) {
+            return;
+        }
+        $this->tags->add($tag);
+        $tag->addPost($this);
+    }
+
+    /**
+     * @param Tag $tag
+     */
+    public function removeTag(Tag $tag)
+    {
+        $this->tags->removeElement($tag);
+        $tag->removePost($this);
     }
 }

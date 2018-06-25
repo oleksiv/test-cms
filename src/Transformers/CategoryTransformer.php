@@ -9,7 +9,8 @@ class CategoryTransformer extends TransformerAbstract
 {
 
     protected $availableIncludes = [
-        'children'
+        'children',
+        'parent',
     ];
 
     /**
@@ -22,6 +23,7 @@ class CategoryTransformer extends TransformerAbstract
             'id' => $category->getId(),
             'title' => $category->getTitle(),
             'content' => $category->getContent(),
+            'status' => $category->getStatus(),
             'alias' => $category->getAlias(),
             'image' => $category->getImage() ? $category->getImage()->getId() : null,
             'created_at' => $category->getCreatedAt(),
@@ -30,8 +32,16 @@ class CategoryTransformer extends TransformerAbstract
 
     }
 
-    public function includeChildren(Category $category) {
+    public function includeChildren(Category $category)
+    {
         return $this->collection($category->getChildren(), new CategoryTransformer());
+    }
+
+    public function includeParent(Category $category)
+    {
+        if ($category->getParent()) {
+            return $this->item($category->getParent(), new CategoryTransformer());
+        }
     }
 
 }

@@ -31,13 +31,20 @@ class CategoryController extends Controller
      */
     public function index(CategoryRepository $categoryRepository, Request $request)
     {
-        $page = $request->get('page', 1) - 1;
-        $limit = $request->get('limit', 10);
-        $query = $categoryRepository->createQueryBuilder('category')
-            // Select only top category items
-            ->where("category.parent IS NULL")
-            ->setMaxResults($limit)
-            ->setFirstResult($page * $limit);
+
+        $query = $categoryRepository->createQueryBuilder('category');
+        // Select only top category items
+        if (!empty($request->get('parent_id'))) {
+            $query = $query->where("category.parent = :parent_id")->setParameter(':parent_id', $request->get('parent_id'));
+        } elseif ($request->get('flat') !== '1') {
+            $query = $query->where("category.parent IS NULL");
+        }
+        if (!empty($request->get('limit'))) {
+            $page = $request->get('page', 1) - 1;
+            $limit = $request->get('limit', 10);
+            $query = $query->setMaxResults($limit)
+                ->setFirstResult($page * $limit);
+        }
         $categories = new Paginator($query);
         $count = count($categories);
         $manager = new Manager();
@@ -92,6 +99,7 @@ class CategoryController extends Controller
     {
         // Serializer manager
         $manager = new Manager();
+        $manager->parseIncludes('parent');
         $manager->setSerializer(new DataSerializer());
         // Prepare data for response
         $resource = new Item($category, new CategoryTransformer());
@@ -114,12 +122,13 @@ class CategoryController extends Controller
         if ($form->isValid()) {
             // Convert alias if needed
             $category->setAliasBasedOnTitle();
-            // Save to database if valid
             $em = $this->getDoctrine()->getManager();
-            $em->persist($category);
+            // Save to database if valid
+            $em->merge($category);
             $em->flush();
             // Transform post data
             $manager = new Manager();
+            $manager->parseIncludes('parent');
             $manager->setSerializer(new DataSerializer());
             // Prepare data for response
             $resource = new Item($category, new CategoryTransformer());

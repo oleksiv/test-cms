@@ -2,77 +2,76 @@
 
 namespace App\Controller\Api;
 
-use App\Entity\Post;
-use App\Form\PostType;
-use App\Repository\PostRepository;
+use App\Entity\Tag;
+use App\Form\TagType;
+use App\Repository\TagRepository;
 use App\Serializers\DataSerializer;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Collection;
 use League\Fractal\Resource\Item;
-use App\Transformers\PostTransformer;
+use App\Transformers\TagTransformer;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
- * Class PostController
+ * Class TagController
  * @package App\Controller\Api
- * @Route("/api/posts")
+ * @Route("/api/tags")
  */
-class PostController extends Controller
+class TagController extends Controller
 {
     /**
-     * @Route("", name="posts_index", methods="GET")
+     * @Route("", name="tags_index", methods="GET")
      *
-     * @param PostRepository $postRepository
+     * @param TagRepository $tagRepository
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    public function index(PostRepository $postRepository, Request $request)
+    public function index(TagRepository $tagRepository, Request $request)
     {
         $page = $request->get('page', 1) - 1;
         $limit = $request->get('limit', 10);
-        $query = $postRepository->createQueryBuilder('post')
+        $query = $tagRepository->createQueryBuilder('post')
             ->setMaxResults($limit)
             ->setFirstResult($page * $limit);
-        $posts = new Paginator($query);
-        $count = count($posts);
+        $tags = new Paginator($query);
+        $count = count($tags);
         $manager = new Manager();
         $manager->parseIncludes('image');
         $manager->setSerializer(new DataSerializer());
-        $resource = new Collection($posts, new PostTransformer($this->container));
+        $resource = new Collection($tags, new TagTransformer());
         return $this->json(array('total_posts' => $count, 'data' => $manager->createData($resource)->toArray()), 200);
     }
 
     /**
-     * @Route("", name="posts_create", methods="POST")
+     * @Route("", name="tags_create", methods="POST")
      *
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     public function create(Request $request)
     {
-        $post = new Post();
+        $tag = new Tag();
         // Set post type to default TYPE_POST
-        $post->setType(Post::TYPE_POST);
-        $form = $this->createForm(PostType::class, $post);
+        $form = $this->createForm(TagType::class, $tag);
         // Fill the form with submitted data
         $form->submit($request->request->all());
         // Validate form
         if ($form->isValid()) {
             // Convert alias if needed
-            $post->setAliasBasedOnTitle();
+            $tag->setAliasBasedOnTitle();
             // Save to database if valid
             $em = $this->getDoctrine()->getManager();
-            $em->persist($post);
+            $em->persist($tag);
             $em->flush();
             // Transform post data
             $manager = new Manager();
             $manager->setSerializer(new DataSerializer());
             // Prepare data for response
-            $resource = new Item($post, new PostTransformer($this->container));
+            $resource = new Item($tag, new TagTransformer());
             // Status code 201 Created
             return $this->json($manager->createData($resource)->toArray(), 201);
         }
@@ -84,40 +83,39 @@ class PostController extends Controller
 
 
     /**
-     * @Route("/{id}", name="posts_show", methods="GET")
+     * @Route("/{id}", name="tags_show", methods="GET")
      *
-     * @param Post $post
+     * @param Tag $tag
      * @return Response
      */
-    public function show(Post $post): Response
+    public function show(Tag $tag): Response
     {
         // Serializer manager
         $manager = new Manager();
-        $manager->parseIncludes('categories,default_category,tags');
+        $manager->parseIncludes('categories,default_category');
         $manager->setSerializer(new DataSerializer());
         // Prepare data for response
-        $resource = new Item($post, new PostTransformer($this->container));
+        $resource = new Item($tag, new TagTransformer());
         return $this->json($manager->createData($resource)->toArray());
     }
 
     /**
-     * @Route("/{id}", name="posts_update", methods="PUT")
+     * @Route("/{id}", name="tags_update", methods="PUT")
      *
-     * @param Post $post
+     * @param Tag $tag
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    public function update(Post $post, Request $request)
+    public function update(Tag $tag, Request $request)
     {
         // Set post type to default TYPE_POST
-        $post->setType(Post::TYPE_POST);
-        $form = $this->createForm(PostType::class, $post);
+        $form = $this->createForm(TagType::class, $tag);
         // Fill the form with submitted data
         $form->submit($request->request->all());
         // Validate form
         if ($form->isValid()) {
             // Convert alias if needed
-            $post->setAliasBasedOnTitle();
+            $tag->setAliasBasedOnTitle();
             // Save to database if valid
             $this->getDoctrine()->getManager()->flush();
             // Transform post data
@@ -126,7 +124,7 @@ class PostController extends Controller
             $manager->parseIncludes('categories,default_category');
             $manager->setSerializer(new DataSerializer());
             // Prepare data for response
-            $resource = new Item($post, new PostTransformer($this->container));
+            $resource = new Item($tag, new TagTransformer());
             // Status code 201 Created
             return $this->json($manager->createData($resource)->toArray(), 200);
         }

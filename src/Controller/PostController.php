@@ -17,6 +17,8 @@ class PostController extends Controller
 {
     /**
      * @Route("/", name="post_index", methods="GET")
+     * @param PostRepository $postRepository
+     * @return Response
      */
     public function index(PostRepository $postRepository): Response
     {
@@ -25,6 +27,8 @@ class PostController extends Controller
 
     /**
      * @Route("/new", name="post_new", methods="GET|POST")
+     * @param Request $request
+     * @return Response
      */
     public function new(Request $request): Response
     {
@@ -56,6 +60,9 @@ class PostController extends Controller
 
     /**
      * @Route("/{id}/edit", name="post_edit", methods="GET|POST")
+     * @param Request $request
+     * @param Post $post
+     * @return Response
      */
     public function edit(Request $request, Post $post): Response
     {
@@ -76,6 +83,9 @@ class PostController extends Controller
 
     /**
      * @Route("/{id}", name="post_delete", methods="DELETE")
+     * @param Request $request
+     * @param Post $post
+     * @return Response
      */
     public function delete(Request $request, Post $post): Response
     {

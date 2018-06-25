@@ -12,6 +12,7 @@ class Category extends Fixture
         for ($i = 0; $i < 100; $i++) {
             $post = new \App\Entity\Category();
             $post->setTitle('Category title #' . $i);
+            $post->setStatus('published');
             $post->setAliasBasedOnTitle();
             $post->setContent('Post content #' . $i);
             $manager->persist($post);
@@ -25,6 +26,7 @@ class Category extends Fixture
             // Create child categories
             $post = new \App\Entity\Category();
             $post->setTitle('Category child for #' . $category->getId());
+            $post->setStatus('published');
             $post->setAliasBasedOnTitle();
             $post->setContent('Category child for #' . $category->getId());
             $post->setParent($category);

@@ -2,20 +2,15 @@
 
 namespace App\Entity;
 
-use App\Contracts\AliasInterface;
 use App\Helpers\StringHelper;
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use App\Contracts\AliasInterface;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\CategoryRepository")
  * @ORM\HasLifecycleCallbacks()
- * @UniqueEntity(
- *     fields={"alias"},
- *     errorPath="alias",
- *     message="This alias is already in use."
- * )
  */
 class Category implements AliasInterface
 {
@@ -27,6 +22,7 @@ class Category implements AliasInterface
     private $id;
 
     /**
+     * @Assert\NotNull()
      * @ORM\Column(type="string", length=255)
      */
     private $title;
@@ -42,20 +38,23 @@ class Category implements AliasInterface
     private $alias;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Image")
+     * @ORM\ManyToOne(targetEntity="Image")
      */
     private $image;
 
     /**
+     * @Assert\NotNull()
+     * @ORM\Column(type="string", length=255)
+     */
+    private $status;
+    /**
      * @ORM\Column(type="datetime")
      */
     private $created_at;
-
     /**
      * @ORM\Column(type="datetime")
      */
     private $updated_at;
-
     /**
      * @ORM\OneToMany(targetEntity="Category", mappedBy="parent")
      */
@@ -65,10 +64,71 @@ class Category implements AliasInterface
      */
     private $parent;
 
+    /**
+     * @ORM\ManyToMany(targetEntity="Post", inversedBy="categories")
+     */
+    private $posts;
+
+    /**
+     * Category constructor.
+     */
     public function __construct()
     {
         $this->children = new ArrayCollection();
+        $this->posts = new ArrayCollection();
     }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return (string)$this->getId();
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getPosts()
+    {
+        return $this->posts;
+    }
+
+    /**
+     * @param $posts
+     * @return Category
+     */
+    public function setPosts($posts)
+    {
+        $this->posts = $posts;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getStatus()
+    {
+        return $this->status;
+    }
+
+    /**
+     * @param mixed $status
+     */
+    public function setStatus($status): void
+    {
+        $this->status = $status;
+    }
+
     /**
      * @return mixed
      */
@@ -94,7 +154,6 @@ class Category implements AliasInterface
     {
         return $this->parent;
     }
-
 
     /**
      * @param mixed $parent
@@ -143,16 +202,18 @@ class Category implements AliasInterface
         return $this;
     }
 
-    public function getId()
-    {
-        return $this->id;
-    }
-
+    /**
+     * @return null|string
+     */
     public function getContent(): ?string
     {
         return $this->content;
     }
 
+    /**
+     * @param null|string $content
+     * @return Category
+     */
     public function setContent(?string $content): self
     {
         $this->content = $content;
@@ -168,13 +229,20 @@ class Category implements AliasInterface
         return $this->image;
     }
 
-    public function setImage(?string $image): self
+    /**
+     * @param $image
+     * @return Category
+     */
+    public function setImage($image): self
     {
         $this->image = $image;
 
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function setAliasBasedOnTitle()
     {
         $value = $this->getAlias() ?? $this->getTitle();
@@ -182,27 +250,62 @@ class Category implements AliasInterface
         return $this;
     }
 
+    /**
+     * @return null|string
+     */
     public function getAlias(): ?string
     {
         return $this->alias;
     }
 
-    public function setAlias(string $alias): self
+    /**
+     * @param $alias
+     * @return $this
+     */
+    public function setAlias($alias)
     {
         $this->alias = $alias;
 
         return $this;
     }
 
+    /**
+     * @return null|string
+     */
     public function getTitle(): ?string
     {
         return $this->title;
     }
 
+    /**
+     * @param $title
+     * @return $this
+     */
     public function setTitle($title)
     {
         $this->title = $title;
 
         return $this;
+    }
+
+    /**
+     * @param Post $post
+     * @return void
+     */
+    public function addPost(Post $post)
+    {
+        if ($this->posts->contains($post)) {
+            return;
+        }
+        $this->posts->add($post);
+        $post->addCategory($this);
+    }
+
+    /**
+     * @param Post $post
+     */
+    public function removePost(Post $post)
+    {
+        $this->posts->removeElement($post);
     }
 }

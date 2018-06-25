@@ -11,7 +11,10 @@ class PostTransformer extends TransformerAbstract
 {
 
     protected $availableIncludes = [
-        'image'
+        'image',
+        'categories',
+        'default_category',
+        'tags',
     ];
 
 
@@ -49,6 +52,27 @@ class PostTransformer extends TransformerAbstract
     {
         if ($post->getImage()) {
             return $this->item($post->getImage(), new ImageTransformer($this->container));
+        }
+    }
+
+    public function includeCategories(Post $post)
+    {
+        if ($post->getCategories()) {
+            return $this->collection($post->getCategories(), new CategoryTransformer());
+        }
+    }
+
+    public function includeDefaultCategory(Post $post)
+    {
+        if ($post->getDefaultCategory()) {
+            return $this->item($post->getDefaultCategory(), new CategoryTransformer());
+        }
+    }
+
+    public function includeTags(Post $post)
+    {
+        if ($post->getTags()) {
+            return $this->collection($post->getTags(), new TagTransformer());
         }
     }
 

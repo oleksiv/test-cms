@@ -4,35 +4,36 @@ namespace App\Form;
 
 use App\Entity\Category;
 use App\Entity\Image;
-use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormBuilderInterface;
+use App\Entity\Post;
+use App\Entity\Tag;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class CategoryType extends AbstractType
+class TagType extends AbstractType
 {
+    /**
+     * @param FormBuilderInterface $builder
+     * @param array $options
+     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
             ->add('title')
             ->add('content')
             ->add('alias')
-            ->add('status')
-            ->add('parent', EntityType::class, array(
-                'class' => Category::class,
-            ))
-            ->add('image', EntityType::class, array(
-                'class' => Image::class
-            ));
+            ->add('status');
     }
 
 
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'data_class' => Category::class,
+            'data_class' => Tag::class,
             'csrf_protection' => false,
-            'allow_extra_fields' => true
+            'cascade_validation' => true,
         ]);
     }
 }
