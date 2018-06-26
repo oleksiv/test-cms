@@ -41,8 +41,11 @@ class FeaturedPostsExtension extends AbstractExtension
      * @throws \Twig_Error_Runtime
      * @throws \Twig_Error_Syntax
      */
-    public function featuredPostsRenderer(\Twig_Environment $environment, Category $category)
+    public function featuredPostsRenderer(\Twig_Environment $environment, Category $category = null)
     {
+        if(empty($category)) {
+            return;
+        }
         $category = $this->entityManager->getRepository(Category::class)
             ->findOneBy(array(
                 'id' => $category->getId()
