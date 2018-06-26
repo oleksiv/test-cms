@@ -20,7 +20,7 @@ class HomeController extends Controller
     {
         // Hardcoded category type is to be changed
         $featured = $this->getDoctrine()->getRepository(Category::class)
-            ->find(42);
+            ->find(1);
         //
         $page = $request->get('page', 1) - 1;
         $limit = 10;
