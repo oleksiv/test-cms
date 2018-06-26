@@ -39,6 +39,7 @@ class PostController extends Controller
         $posts = new Paginator($query);
         $count = count($posts);
         $manager = new Manager();
+        $manager->setRecursionLimit(5);
         $manager->parseIncludes('image');
         $manager->setSerializer(new DataSerializer());
         $resource = new Collection($posts, new PostTransformer($this->container));
