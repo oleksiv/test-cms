@@ -1,0 +1,37 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Homepage{% endblock %}
+
+{% block body %}
+    <hr class="mt-0">
+    <main role="main">
+        <div class="row">
+            <div class="col-md-8 blog-main">
+                <div class="mb-5">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="{{ path('home') }}">Home</a></li>
+                            <li class="breadcrumb-item"><a href="{{ path('category_show', {'alias': post.defaultCategory.alias}) }}">{{ post.defaultCategory.title }}</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">{{ post.title }}</li>
+                        </ol>
+                    </nav>
+                </div>
+
+                <h3 class="pb-3 mb-4 font-italic border-bottom">
+                    {{ post.title }}
+                </h3>
+
+                <div>
+                    <p>{{ post.content }}</p>
+                </div>
+
+            </div><!-- /.blog-main -->
+
+            {# Sidebar #}
+            {% include 'sidebar/index.html.twig' %}
+        </div><!-- /.row -->
+
+    </main><!-- /.container -->
+
+{% endblock %}
+

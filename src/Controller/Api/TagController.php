@@ -54,6 +54,20 @@ class TagController extends Controller
      */
     public function create(Request $request)
     {
+        // Create serializer
+        $manager = new Manager();
+        $manager->setSerializer(new DataSerializer());
+        // Search for existing tag
+        $found = $this->getDoctrine()->getRepository(Tag::class)
+            ->findOneBy(array(
+                'title' => $request->get('title')
+            ));
+        // If tag is found, return it
+        if ($found) {
+            $resource = new Item($found, new TagTransformer());
+            return $this->json($manager->createData($resource)->toArray(), 200);
+        }
+        // If not found, create new tag.
         $tag = new Tag();
         // Set post type to default TYPE_POST
         $form = $this->createForm(TagType::class, $tag);
@@ -67,9 +81,6 @@ class TagController extends Controller
             $em = $this->getDoctrine()->getManager();
             $em->persist($tag);
             $em->flush();
-            // Transform post data
-            $manager = new Manager();
-            $manager->setSerializer(new DataSerializer());
             // Prepare data for response
             $resource = new Item($tag, new TagTransformer());
             // Status code 201 Created

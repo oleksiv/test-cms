@@ -4,14 +4,13 @@ namespace App\Controller\Api;
 
 use App\Entity\Post;
 use App\Form\PostType;
+use League\Fractal\Manager;
+use League\Fractal\Resource\Item;
 use App\Repository\PostRepository;
 use App\Serializers\DataSerializer;
-use Doctrine\ORM\Tools\Pagination\Paginator;
-use League\Fractal\Manager;
-use League\Fractal\Resource\Collection;
-use League\Fractal\Resource\Item;
 use App\Transformers\PostTransformer;
-use Symfony\Component\HttpFoundation\JsonResponse;
+use League\Fractal\Resource\Collection;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -35,6 +34,7 @@ class PostController extends Controller
         $page = $request->get('page', 1) - 1;
         $limit = $request->get('limit', 10);
         $query = $postRepository->createQueryBuilder('post')
+            ->where('post.status = :status')->setParameter(':status', 'published')
             ->setMaxResults($limit)
             ->setFirstResult($page * $limit);
         $posts = new Paginator($query);
@@ -123,7 +123,7 @@ class PostController extends Controller
             // Transform post data
             $manager = new Manager();
             // Include categories and default_category properties
-            $manager->parseIncludes('categories,default_category');
+            $manager->parseIncludes('categories,default_category,tags');
             $manager->setSerializer(new DataSerializer());
             // Prepare data for response
             $resource = new Item($post, new PostTransformer($this->container));

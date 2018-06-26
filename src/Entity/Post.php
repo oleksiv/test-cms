@@ -105,6 +105,7 @@ class Post implements AliasInterface
     }
 
     /**
+     * @Assert\NotNull(message="Please, select primary category.")
      * @ORM\ManyToOne(targetEntity="Category", inversedBy="posts", cascade={"persist"})
      */
     private $default_category;
