@@ -19,9 +19,9 @@
                         <strong class="d-inline-block mb-2 text-primary">{{ category.title }}</strong>
                         <h3 class="mb-0">
                             {% if post.title | length > 30 %}
-                                <a class="text-dark" href="#">{{ post.title | slice(0, 30) ~ '...' }}</a>
+                                <a class="text-dark" href="{{ path('blog_post_show', {'alias': post.alias}) }}">{{ post.title | slice(0, 30) ~ '...' }}</a>
                             {% else %}
-                                <a class="text-dark" href="#">{{ post.title }}</a>
+                                <a class="text-dark" href="{{ path('blog_post_show', {'alias': post.alias}) }}">{{ post.title }}</a>
                             {% endif %}
 
                         </h3>

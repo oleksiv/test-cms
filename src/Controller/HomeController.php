@@ -20,7 +20,7 @@ class HomeController extends Controller
     {
         // Hardcoded category type is to be changed
         $featured = $this->getDoctrine()->getRepository(Category::class)
-            ->find(1);
+            ->findAll();
         //
         $page = $request->get('page', 1) - 1;
         $limit = 10;
@@ -34,7 +34,7 @@ class HomeController extends Controller
         $count = count($posts);
         // View
         return $this->render('home/index.html.twig', [
-            'featured' => $featured,
+            'featured' => count($featured) ? $featured[0] : null,
             'posts' => $posts,
             'total' => $count,
             'limit' => $limit,
