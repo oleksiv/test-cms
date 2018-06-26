@@ -34,7 +34,6 @@ class PostController extends Controller
         $page = $request->get('page', 1) - 1;
         $limit = $request->get('limit', 10);
         $query = $postRepository->createQueryBuilder('post')
-            ->where('post.status = :status')->setParameter(':status', 'published')
             ->setMaxResults($limit)
             ->setFirstResult($page * $limit);
         $posts = new Paginator($query);
